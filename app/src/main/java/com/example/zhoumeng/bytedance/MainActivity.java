@@ -10,7 +10,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mBtn;
     private TextView mTxtv;
     private String[] str = {"I'm back!","I've changed!"};
-    private int index = 0;
+    private int index = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,14 +20,7 @@ public class MainActivity extends AppCompatActivity {
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index == 1){
-                    mTxtv.setText(str[0]);
-                    index = 0;
-                }
-                else {
-                    mTxtv.setText(str[1]);
-                    index = 1;
-                }
+                mTxtv.setText(str[(index++)%2]);
 
             }
         });
