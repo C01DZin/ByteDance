@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ByteDance</string>
+    <string name="btn_name">button</string>
 </resources>
