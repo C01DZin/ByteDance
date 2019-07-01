@@ -2,6 +2,7 @@ package chapter.android.aweme.ss.com.homework;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class Exercises3 extends AppCompatActivity {
         rv = findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter = new Adapter(this));
+
 
         like = findViewById(R.id.like);
         fans = findViewById(R.id.fans);
@@ -88,7 +90,20 @@ public class Exercises3 extends AppCompatActivity {
             return holder;
         }
         @Override
-        public void onBindViewHolder(MyViewHolder holder,int position){
+        public void onBindViewHolder(MyViewHolder holder, final int position){
+
+            holder.title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Exercises3.this,ChatRoom.class);
+                    intent.putExtra("description",msgList.get(position).getDescription());
+                    intent.putExtra("time",msgList.get(position).getTime());
+                    intent.putExtra("title",msgList.get(position).getTitle());
+                    intent.putExtra("position",position);
+                    startActivity(intent);
+                }
+            });
+
             holder.description.setText(msgList.get(position).getDescription());
             holder.time.setText(msgList.get(position).getTime());
             holder.title.setText(msgList.get(position).getTitle());
