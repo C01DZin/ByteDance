@@ -15,7 +15,7 @@ import android.widget.ListView;
  * 用一个TextView展示出来
  */
 public class Exercises2 extends AppCompatActivity {
-
+    public static int sum = 0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +23,15 @@ public class Exercises2 extends AppCompatActivity {
     }
 
     public static int getViewCount(View view) {
-
+        if(view instanceof ViewGroup){
+            ViewGroup vg  = (ViewGroup) view;
+            for(int i=0;i<vg.getChildCount();i++){
+                getViewCount(vg.getChildAt(i));
+            }
+        }
+        else{
+            sum++;
+        }
 
 
         return 2;
