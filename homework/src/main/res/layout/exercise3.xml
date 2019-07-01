@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/liner"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="赞"
+            android:onClick="showText"
+            />
+        <Button
+            android:id="@+id/fans"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="粉丝"
+            android:onClick="showText"
+            android:layout_toRightOf="@+id/like"/>
+        <Button
+            android:id="@+id/at"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/@我的"
+            android:onClick="showText"
+
+            android:layout_toRightOf="@+id/fans"/>
+        <Button
+            android:id="@+id/comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="评论"
+            android:onClick="showText"
+            android:layout_toStartOf="@+id/rv"
+            android:layout_toRightOf="@+id/at"/>
+    </LinearLayout>
+    <!--控件列表-->
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rv"
+        android:background="#EEEEEE"
+        android:orientation="vertical"
+        android:layout_below="@+id/liner"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+
+
+
+</RelativeLayout>
