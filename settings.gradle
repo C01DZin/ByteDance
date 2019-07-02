@@ -1,1 +1,1 @@
-include ':app', ':homework'
+include ':app', ':homework', ':homework_chap3'

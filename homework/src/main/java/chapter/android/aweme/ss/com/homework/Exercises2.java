@@ -32,8 +32,6 @@ public class Exercises2 extends AppCompatActivity {
         else{
             sum++;
         }
-
-
-        return 2;
+        return sum;
     }
 }
