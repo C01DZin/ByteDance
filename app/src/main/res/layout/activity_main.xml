@@ -58,5 +58,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
+    <fragment
+        app:layout_constraintBottom_toTopOf="@+id/editText2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/frag2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.zhoumeng.bytedance.BlankFragment"></fragment>
 
 </android.support.constraint.ConstraintLayout>
