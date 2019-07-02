@@ -1,12 +1,13 @@
 package com.example.zhoumeng.bytedance;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.nfc.Tag;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +23,20 @@ public class MainActivity extends AppCompatActivity {
         mBtn = findViewById(R.id.button);
         mTxtv = findViewById(R.id.textView);
         System.out.println("on create");
+
+        final ImageView iv = findViewById(R.id.imageView);
+        ValueAnimator va = ValueAnimator.ofFloat(0,360);
+        va.setRepeatCount(ValueAnimator.INFINITE);
+        va.setInterpolator(new AccelerateInterpolator());
+        va.setRepeatMode(ValueAnimator.RESTART);
+        va.setDuration(9000);
+        va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                iv.setRotation((float)animation.getAnimatedValue());
+            }
+        });
+        va.start();
 
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override

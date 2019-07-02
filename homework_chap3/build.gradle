@@ -32,4 +32,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+
+    // lottie Android 官网：https://airbnb.io/lottie/#/android
+    implementation 'com.airbnb.android:lottie:2.7.0'
+
+    // 这里添加了一个外部库，用来选择颜色
+    // https://github.com/Pes8/android-material-color-picker-dialog
+    implementation 'com.pes.materialcolorpicker:library:1.2.4'
+    // 这里添加了对话框库，用来输入时长
+    // https://github.com/afollestad/material-dialogs
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 }
