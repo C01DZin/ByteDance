@@ -17,7 +17,7 @@
         app:lottie_autoPlay="true"
         app:lottie_rawRes="@raw/material_wave_loading"
         app:lottie_repeatMode="restart"
-        app:lottie_progress="5"
+        app:lottie_loop="true"
         />
 
     <LinearLayout
