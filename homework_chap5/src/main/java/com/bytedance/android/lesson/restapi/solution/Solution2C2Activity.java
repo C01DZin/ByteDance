@@ -13,16 +13,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.bytedance.android.lesson.restapi.solution.bean.Feed;
+import com.bytedance.android.lesson.restapi.solution.bean.FeedResponse;
+import com.bytedance.android.lesson.restapi.solution.newtork.IMiniDouyinService;
 import com.bytedance.android.lesson.restapi.solution.utils.ResourceUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Solution2C2Activity extends AppCompatActivity {
 
@@ -85,8 +92,8 @@ public class Solution2C2Activity extends AppCompatActivity {
                 ImageView iv = (ImageView) viewHolder.itemView;
 
                 // TODO-C2 (10) Uncomment these 2 lines, assign image url of Feed to this url variable
-//                String url = mFeeds.get(i).;
-//                Glide.with(iv.getContext()).load(url).into(iv);
+                    String url = mFeeds.get(i).getImage_url();
+                    Glide.with(iv.getContext()).load(url).into(iv);
             }
 
             @Override public int getItemCount() {
@@ -97,11 +104,20 @@ public class Solution2C2Activity extends AppCompatActivity {
 
     public void chooseImage() {
         // TODO-C2 (4) Start Activity to select an image
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"select picture"),PICK_IMAGE);
+
     }
 
 
     public void chooseVideo() {
         // TODO-C2 (5) Start Activity to select a video
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"select video"),PICK_VIDEO);
     }
 
     @Override
@@ -146,6 +162,35 @@ public class Solution2C2Activity extends AppCompatActivity {
         // TODO-C2 (9) Send Request to fetch feed
         // if success, assign data to mFeeds and call mRv.getAdapter().notifyDataSetChanged()
         // don't forget to call resetRefreshBtn() after response received
+        new Thread() {
+            @Override
+            public void run() {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://test.androidcamp.bytedance.com/")
+                        .addConverterFactory(GsonConverterFactory.create()).build();
+
+                Response<FeedResponse> response = null;
+                try {
+                    response = retrofit.create(IMiniDouyinService.class).getVideo().execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "run: 222");
+
+                if (response.body().isSuccess() != false) {
+
+                    final Response<FeedResponse> finalResponse = response;
+                    mRv.post(new Runnable() {
+                        public void run() {
+                            mFeeds = finalResponse.body().getFeeds();
+                            mRv.getAdapter().notifyDataSetChanged();
+
+                        }
+                    });
+                   // Toast.makeText(Solution2C2Activity.this,"load success",Toast.LENGTH_SHORT);
+                } else Log.d(TAG, "run: 123456789null");
+            }
+        }    .start();
     }
 
     private void resetRefreshBtn() {
