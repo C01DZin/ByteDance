@@ -1,9 +1,12 @@
 package com.bytedance.android.lesson.restapi.solution;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,10 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bytedance.android.lesson.restapi.solution.bean.Feed;
 import com.bytedance.android.lesson.restapi.solution.bean.FeedResponse;
+import com.bytedance.android.lesson.restapi.solution.bean.PostVideoResponse;
 import com.bytedance.android.lesson.restapi.solution.newtork.IMiniDouyinService;
 import com.bytedance.android.lesson.restapi.solution.utils.ResourceUtils;
 
@@ -149,7 +154,48 @@ public class Solution2C2Activity extends AppCompatActivity {
 
     private void postVideo() {
         mBtn.setText("POSTING...");
+        if(ContextCompat.checkSelfPermission(this,"android.permission.READ_EXTERNAL_STORAGE")!=0){
+            String[] per = new String[] {"android.permission.READ_EXTERNAL_STORAGE"};
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+            }
+        }
+
         mBtn.setEnabled(false);
+        final MultipartBody.Part coverImage = getMultipartFromUri("cover_image",mSelectedImage);
+        final MultipartBody.Part video = getMultipartFromUri("video",mSelectedVideo);
+
+        new Thread() {
+            @Override
+            public void run() {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://test.androidcamp.bytedance.com/")
+                        .addConverterFactory(GsonConverterFactory.create()).build();
+
+                Response<PostVideoResponse> response = null;
+                try {
+                    response = retrofit.create(IMiniDouyinService.class)
+                            .postVideo("16061198","electronic",
+                                    coverImage,video).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "run: 222");
+
+                if (response.body().isSuccess() != false) {
+                    mRv.post(new Runnable() {
+                        public void run() {
+                            mBtn.setText(R.string.select_an_image);
+                            mBtn.setEnabled(true);
+                            Toast.makeText(Solution2C2Activity.this,"post success",Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+                } else Log.d(TAG, "run: 123456789null");
+            }
+        }    .start();
+
 
         // TODO-C2 (6) Send Request to post a video with its cover image
         // if success, make a text Toast and show
@@ -184,10 +230,11 @@ public class Solution2C2Activity extends AppCompatActivity {
                         public void run() {
                             mFeeds = finalResponse.body().getFeeds();
                             mRv.getAdapter().notifyDataSetChanged();
-
+                            Toast.makeText(Solution2C2Activity.this,"load success",Toast.LENGTH_SHORT).show();
+                            resetRefreshBtn();
                         }
                     });
-                   // Toast.makeText(Solution2C2Activity.this,"load success",Toast.LENGTH_SHORT);
+
                 } else Log.d(TAG, "run: 123456789null");
             }
         }    .start();

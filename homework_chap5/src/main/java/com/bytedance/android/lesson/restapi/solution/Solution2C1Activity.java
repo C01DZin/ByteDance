@@ -112,9 +112,6 @@ public class Solution2C1Activity extends AppCompatActivity {
 
         }.start();
 
-
-
-        //loadPics();
         restoreBtn();
 
 
