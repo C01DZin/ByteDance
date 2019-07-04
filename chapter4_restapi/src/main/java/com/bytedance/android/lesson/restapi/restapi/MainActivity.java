@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bytedance.android.lesson.restapi.restapi.bean.Joke;
 import com.bytedance.android.lesson.restapi.restapi.bean.OSList;
@@ -14,10 +13,6 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void requestData(View view) {
         // HttpURLConnection
-//        String s = NetworkUtils.getResponseWithHttpURLConnection("https://api.icndb.com/jokes/random");
-//        mTv.setText(s);
+        String s = NetworkUtils.getResponseWithHttpURLConnection("https://api.icndb.com/jokes/random");
+        mTv.setText(s);
 
         // Retrofit
-//        Joke j = NetworkUtils.getResponseWithRetrofit();
-//        mTv.setText(j.getValue().getJoke());
+        Joke j = NetworkUtils.getResponseWithRetrofit();
+        mTv.setText(j.getValue().getJoke());
     }
 }
