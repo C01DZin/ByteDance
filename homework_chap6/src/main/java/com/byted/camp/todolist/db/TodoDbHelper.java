@@ -10,16 +10,18 @@ import android.database.sqlite.SQLiteOpenHelper;
  * @author xuyingyi@bytedance.com (Yingyi Xu)
  */
 public class TodoDbHelper extends SQLiteOpenHelper {
-
+    public static final int DB_VERSION = 1;
+    public static final String DB_NAME = "TodoList.db";
     // TODO 定义数据库名、版本；创建数据库
 
     public TodoDbHelper(Context context) {
-        super(context, "todo", null, 0);
+
+        super(context, "todo", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        db.execSQL(TodoContract.SQL_CREATE_ENTRIES);
     }
 
     @Override
