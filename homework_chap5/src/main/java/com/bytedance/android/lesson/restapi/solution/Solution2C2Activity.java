@@ -155,7 +155,6 @@ public class Solution2C2Activity extends AppCompatActivity {
     private void postVideo() {
         mBtn.setText("POSTING...");
         if(ContextCompat.checkSelfPermission(this,"android.permission.READ_EXTERNAL_STORAGE")!=0){
-            String[] per = new String[] {"android.permission.READ_EXTERNAL_STORAGE"};
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
             }
@@ -180,7 +179,7 @@ public class Solution2C2Activity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "run: 222");
+
 
                 if (response.body().isSuccess() != false) {
                     mRv.post(new Runnable() {
@@ -194,7 +193,7 @@ public class Solution2C2Activity extends AppCompatActivity {
 
                 } else Log.d(TAG, "run: 123456789null");
             }
-        }    .start();
+        }.start();
 
 
         // TODO-C2 (6) Send Request to post a video with its cover image
