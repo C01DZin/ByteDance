@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Video Player</string>
+    <string name="yuminghong">./res/raw/yuminghong.flv</string>
 </resources>
