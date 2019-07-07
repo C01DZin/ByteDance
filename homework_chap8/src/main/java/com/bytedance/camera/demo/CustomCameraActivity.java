@@ -1,6 +1,7 @@
 package com.bytedance.camera.demo;
 
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.bytedance.camera.demo.utils.Utils.MEDIA_TYPE_IMAGE;
+import static com.bytedance.camera.demo.utils.Utils.MEDIA_TYPE_VIDEO;
 import static com.bytedance.camera.demo.utils.Utils.getOutputMediaFile;
 
 public class CustomCameraActivity extends AppCompatActivity {
@@ -37,29 +39,38 @@ public class CustomCameraActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_custom_camera);
-
+        mCamera = getCamera(CAMERA_TYPE);
         mSurfaceView = findViewById(R.id.img);
         //todo 给SurfaceHolder添加Callback
         SurfaceHolder sh = mSurfaceView.getHolder();
+        sh.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         sh.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-
+                try {
+                    mCamera.setPreviewDisplay(holder);
+                    mCamera.startPreview();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+                Log.d("jzh", "surfaceChanged: ");
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
             }
         });
 
         findViewById(R.id.btn_picture).setOnClickListener(v -> {
             //todo 拍一张照片
+            mCamera.takePicture(null,null,mPicture);
 
         });
 
@@ -67,14 +78,44 @@ public class CustomCameraActivity extends AppCompatActivity {
             //todo 录制，第一次点击是start，第二次点击是stop
             if (isRecording) {
                 //todo 停止录制
-                isRecording = false;
+                releaseMediaRecorder();
             } else {
                 //todo 录制
+                prepareVideoRecorder();
             }
         });
 
         findViewById(R.id.btn_facing).setOnClickListener(v -> {
             //todo 切换前后摄像头
+            if(CAMERA_TYPE == Camera.CameraInfo.CAMERA_FACING_BACK){
+                CAMERA_TYPE = Camera.CameraInfo.CAMERA_FACING_FRONT;
+                releaseCameraAndPreview();
+                mCamera = getCamera(CAMERA_TYPE);
+               try{
+                   mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+               }
+               catch(IOException e) {
+                   e.printStackTrace();
+               }
+                mCamera.startPreview();
+
+
+
+            }
+            else {
+                CAMERA_TYPE = Camera.CameraInfo.CAMERA_FACING_BACK;
+                releaseCameraAndPreview();
+                mCamera = getCamera(CAMERA_TYPE);
+                try{
+                    mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                }
+                mCamera.startPreview();
+
+            }
+
         });
 
         findViewById(R.id.btn_zoom).setOnClickListener(v -> {
@@ -88,7 +129,8 @@ public class CustomCameraActivity extends AppCompatActivity {
             releaseCameraAndPreview();
         }
         Camera cam = Camera.open(position);
-
+        rotationDegree = getCameraDisplayOrientation(position);
+        cam.setDisplayOrientation(rotationDegree);
         //todo 摄像头添加属性，例是否自动对焦，设置旋转方向等
 
         return cam;
@@ -137,6 +179,9 @@ public class CustomCameraActivity extends AppCompatActivity {
 
     private void releaseCameraAndPreview() {
         //todo 释放camera资源
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
     }
 
     Camera.Size size;
@@ -150,13 +195,38 @@ public class CustomCameraActivity extends AppCompatActivity {
 
     private boolean prepareVideoRecorder() {
         //todo 准备MediaRecorder
+        isRecording = true;
+        mMediaRecorder = new MediaRecorder();
+        mCamera.unlock();
+        mMediaRecorder.setCamera(mCamera);
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        Log.d("jzh", "onCreate: "+ getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+        mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
 
+        mMediaRecorder.setPreviewDisplay(mSurfaceView.getHolder().getSurface());
+        mMediaRecorder.setOrientationHint(rotationDegree);
+
+        try{
+            mMediaRecorder.prepare();
+            mMediaRecorder.start();
+        }catch(IOException e){
+            releaseMediaRecorder();
+            return false;
+        }
         return true;
     }
 
 
     private void releaseMediaRecorder() {
         //todo 释放MediaRecorder
+        mMediaRecorder.stop();
+        mMediaRecorder.reset();
+        mMediaRecorder.release();
+        mMediaRecorder = null;
+        mCamera.lock();
+        isRecording = false;
     }
 
 
