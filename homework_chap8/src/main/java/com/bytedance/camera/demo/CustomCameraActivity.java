@@ -4,6 +4,8 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
@@ -31,6 +33,35 @@ public class CustomCameraActivity extends AppCompatActivity {
     private boolean isRecording = false;
 
     private int rotationDegree = 0;
+
+
+    private static final int MSG_AUTOFUCS = 1001;
+    private Handler handler;
+
+    AutoFocusCallback autoFocusCallback;
+    static final class AutoFocusCallback implements Camera.AutoFocusCallback {
+        private static final String TAG = AutoFocusCallback.class.getName();
+        private static final long AUTO_FOCUS_INTERVAL_MS = 1300L; //自动对焦时间
+
+        private Handler mAutoFocusHandler;
+        private int mAutoFocusMessage;
+
+        void setHandler(Handler autoFocusHandler, int autoFocusMessage) {
+            this.mAutoFocusHandler = autoFocusHandler;
+            this.mAutoFocusMessage = autoFocusMessage;
+        }
+
+        @Override
+        public void onAutoFocus(boolean success, Camera camera) {
+            Log.v("zzw", "autof focus "+success);
+            if (mAutoFocusHandler != null) {
+                mAutoFocusHandler.sendEmptyMessageDelayed(mAutoFocusMessage,AUTO_FOCUS_INTERVAL_MS);
+//            mAutoFocusHandler = null;
+            } else {
+                Log.v(TAG, "Got auto-focus callback, but no handler for it");
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +113,7 @@ public class CustomCameraActivity extends AppCompatActivity {
             } else {
                 //todo 录制
                 prepareVideoRecorder();
+
             }
         });
 
@@ -120,8 +152,27 @@ public class CustomCameraActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_zoom).setOnClickListener(v -> {
             //todo 调焦，需要判断手机是否支持
+
+            handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    Log.v("zzw",""+msg.what);
+                    switch (msg.what){
+                        case MSG_AUTOFUCS:
+                            mCamera.autoFocus(autoFocusCallback);
+                            break;
+                    }
+                }
+            };
+
         });
+        autoFocusCallback = new AutoFocusCallback();
+        autoFocusCallback.setHandler(handler,MSG_AUTOFUCS);
+
+
     }
+
+
 
     public Camera getCamera(int position) {
         CAMERA_TYPE = position;
@@ -132,6 +183,12 @@ public class CustomCameraActivity extends AppCompatActivity {
         rotationDegree = getCameraDisplayOrientation(position);
         cam.setDisplayOrientation(rotationDegree);
         //todo 摄像头添加属性，例是否自动对焦，设置旋转方向等
+        Camera.Parameters params = cam.getParameters();
+// set the focus mode
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        //params.setPreviewSize();
+// set Camera parameters
+        cam.setParameters(params);
 
         return cam;
     }
@@ -186,9 +243,7 @@ public class CustomCameraActivity extends AppCompatActivity {
 
     Camera.Size size;
 
-    private void startPreview(SurfaceHolder holder) {
-        //todo 开始预览
-    }
+
 
 
     private MediaRecorder mMediaRecorder;
@@ -207,7 +262,6 @@ public class CustomCameraActivity extends AppCompatActivity {
 
         mMediaRecorder.setPreviewDisplay(mSurfaceView.getHolder().getSurface());
         mMediaRecorder.setOrientationHint(rotationDegree);
-
         try{
             mMediaRecorder.prepare();
             mMediaRecorder.start();
@@ -217,7 +271,12 @@ public class CustomCameraActivity extends AppCompatActivity {
         }
         return true;
     }
+    private boolean startPreview(SurfaceHolder holder) {
+        //todo 开始预览
 
+        return true;
+
+    }
 
     private void releaseMediaRecorder() {
         //todo 释放MediaRecorder
